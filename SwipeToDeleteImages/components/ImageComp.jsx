@@ -1,14 +1,26 @@
 import {Image} from 'expo-image'
 import { GestureHandlerRootView , PanGestureHandler} from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import {StyleSheet, Button, View, Platform, Dimensions, Text} from 'react-native';
+
+import {getData , storeData} from '@/components/DataStore';
+
 import * as MediaLibrary from 'expo-media-library';
 
 var ListOfToDeleteImages = [];
 
+const UpdateDeletedImages = async(CurrentCount) =>{
+    try {
+        await storeData('totalPhotosDeleted', CurrentCount);
+    } catch (error) {
+        console.error('Error updating deleted images:', error);
+    }
+}
+
+
+
 export default function SwipeableImage(props) {
-    const [imageUri, setImageUri] = useState('');
     const [imageAsset, setImageAsset] = useState(null);
     const [translateX, settranslateX] = useState(0);
     const [rotateZ, setrotateZ] = useState(0);
@@ -16,22 +28,36 @@ export default function SwipeableImage(props) {
     const [CurrentImageIndex, setCurrentImageIndex] = useState(0);
     
     const [IsStartButtonVisible, setIsStartButtonVisible] = useState(true);
-    
-
     const [DirText, setDirText] = useState('');
+
+    const [totalPhotosDeleted, setTotalPhotosDeleted] = useState(0);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const data = await getData('totalPhotosDeleted');
+          console.log('data:', data);
+          setTotalPhotosDeleted(Number(data));
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+  
+      fetchData();
+    }, []);
   
     const onGestureEvent = (event) => {
       settranslateX(event.nativeEvent.translationX);
       setrotateZ(translateX / 10); // Adjust the divisor to control the rotation sensitivity
 
-      if (event.nativeEvent.translationX > 0) {
+      if (event.nativeEvent.translationX > 25) {
         setDirText('Keep');
-      }else if (event.nativeEvent.translationX < 0) {
+      }else if (event.nativeEvent.translationX < -25) {
         setDirText('Delete');
-        
+      }else {
+        setDirText('');
       }
 
-      console.log(`onGestureEvent: translateX=${translateX}, rotateZ=${rotateZ.value}`);
     };
   
     const onHandlerStateChange = (event) => {
@@ -41,6 +67,8 @@ export default function SwipeableImage(props) {
           pickRandomImage();
         } else if (event.nativeEvent.translationX < -50) {
             ListOfToDeleteImages.push(imageAsset);
+            setTotalPhotosDeleted(totalPhotosDeleted + 1);
+            
           pickRandomImage();
 
         }
@@ -81,7 +109,7 @@ export default function SwipeableImage(props) {
         if (media.length > 0) {
           const randomImage = media[CurrentImageIndex].uri;
             setImageAsset(media[CurrentImageIndex]);
-          setImageUri(randomImage);
+          
         }
       } catch (error) {
         console.error('Error picking random image:', error);
@@ -104,22 +132,26 @@ export default function SwipeableImage(props) {
           onHandlerStateChange={onHandlerStateChange}
         >
           <Animated.View style={[styles.imageContainer, animatedStyle]}>
-            <Text style={styles.DirText}>{DirText}</Text>
-            {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
+            <Text style={styles.DirText(DirText)}>{DirText}</Text>
+            {imageAsset && <Image source={{ uri: imageAsset.uri }} style={styles.image} />}
           </Animated.View>
         </PanGestureHandler>
         {IsStartButtonVisible ? <Button title="Start Deleting" onPress={pickRandomImage} /> : null}
-        <Button title={"Delete Selected Images: " + ListOfToDeleteImages.length} onPress={() => DeleteImage(ListOfToDeleteImages)} />
+        {IsStartButtonVisible ? null : <Button title={"Delete Selected Images: " + ListOfToDeleteImages.length} onPress={() => DeleteImage(ListOfToDeleteImages,totalPhotosDeleted)} />}
       </GestureHandlerRootView>
     );
 }
 
 
-const DeleteImage = async (imageasset) => {
+const DeleteImage = async (imageasset, totalPhotosDeleted) => {
     try {
-        console.log('Deleting image:', imageasset.uri);
+        console.log('Deleting image:', imageasset);
         ListOfToDeleteImages = [];
+        UpdateDeletedImages(totalPhotosDeleted);
         await MediaLibrary.deleteAssetsAsync(imageasset);
+
+        
+
     }catch (error) {
         console.error('Error deleting image:', error);
     }
@@ -148,10 +180,21 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         justifyContent: 'center',
     },
-    DirText: {
-      color: 'white',
-      fontSize: 50,
-        textAlign: 'center',
-      zIndex: 1
+    DirText: (color) => {
+        if (color === 'Delete') {
+            return{
+                color: 'red',
+                fontSize: 50,
+                textAlign: 'center',
+                zIndex: 1
+            }
+        }
+        return{
+            color: '#66ff66',
+            fontSize: 60,
+            
+            textAlign: 'center',
+            zIndex: 1
+        }
     },
   });
