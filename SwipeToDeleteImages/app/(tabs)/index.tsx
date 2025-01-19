@@ -6,6 +6,7 @@ import {StyleSheet, Button, View, Platform} from 'react-native';
 
 import  SwipeableImage  from '@/components/ImageComp'
 
+
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -17,6 +18,7 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
         <SwipeableImage  />
+        
     </ThemedView>
   );
 }
@@ -24,6 +26,9 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    
+    flexDirection: 'column',
+    
     justifyContent: 'center',
     alignItems: 'center',
   },

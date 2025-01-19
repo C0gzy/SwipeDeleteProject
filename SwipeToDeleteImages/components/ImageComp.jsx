@@ -6,6 +6,8 @@ import {StyleSheet, Button, View, Platform, Dimensions, Text} from 'react-native
 
 import {getData , storeData} from '@/components/DataStore';
 
+import Sidebar from '@/components/sidebar'
+
 import * as MediaLibrary from 'expo-media-library';
 
 var ListOfToDeleteImages = [];
@@ -18,6 +20,9 @@ const UpdateDeletedImages = async(CurrentCount) =>{
     }
 }
 
+export function FetchListOfToDeleteImages(){
+    return ListOfToDeleteImages;
+}
 
 
 export default function SwipeableImage(props) {
@@ -126,6 +131,7 @@ export default function SwipeableImage(props) {
     });
   
     return (
+        <View>
       <GestureHandlerRootView style={styles.MainImageDector}>
         <PanGestureHandler
           onGestureEvent={onGestureEvent}
@@ -136,14 +142,21 @@ export default function SwipeableImage(props) {
             {imageAsset && <Image source={{ uri: imageAsset.uri }} style={styles.image} />}
           </Animated.View>
         </PanGestureHandler>
+        
+        
         {IsStartButtonVisible ? <Button title="Start Deleting" onPress={pickRandomImage} /> : null}
+        {/*
         {IsStartButtonVisible ? null : <Button title={"Delete Selected Images: " + ListOfToDeleteImages.length} onPress={() => DeleteImage(ListOfToDeleteImages,totalPhotosDeleted)} />}
-      </GestureHandlerRootView>
+        */}
+        </GestureHandlerRootView>
+        <Sidebar AmountToDelete={ListOfToDeleteImages.length} totalPhotosDeleted={totalPhotosDeleted} ListOfToDeleteImages={ListOfToDeleteImages}></Sidebar>
+        </View>
+      
     );
 }
 
 
-const DeleteImage = async (imageasset, totalPhotosDeleted) => {
+export const DeleteImage = async (imageasset, totalPhotosDeleted) => {
     try {
         console.log('Deleting image:', imageasset);
         ListOfToDeleteImages = [];
@@ -167,7 +180,7 @@ const styles = StyleSheet.create({
     image: {
         width: Dimensions.get('window').width - 20,
         height: Dimensions.get('window').height - 300,
-      borderWidth: 2,
+      borderWidth: 0,
       borderColor: 'white',
     },
     MainImageDector: {
