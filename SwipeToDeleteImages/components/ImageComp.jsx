@@ -8,9 +8,11 @@ import {getData , storeData} from '@/components/DataStore';
 
 import Sidebar from '@/components/sidebar'
 
+import dayjs from 'dayjs';
 import * as MediaLibrary from 'expo-media-library';
 
 var ListOfToDeleteImages = [];
+var media = [];
 
 const UpdateDeletedImages = async(CurrentCount) =>{
     try {
@@ -36,6 +38,9 @@ export default function SwipeableImage(props) {
     const [DirText, setDirText] = useState('');
 
     const [totalPhotosDeleted, setTotalPhotosDeleted] = useState(0);
+
+    const [currentYear , setcurrentYear] = useState(2022);
+    
 
     useEffect(() => {
       const fetchData = async () => {
@@ -64,17 +69,29 @@ export default function SwipeableImage(props) {
       }
 
     };
+
+    const filterAssetsByYear = (assets, year) => {
+        var filtered = media.filter(asset => dayjs(asset.creationTime).year() === year)
+        if (!assets) {
+          return [];
+        }else if (year === null) {
+            return media;
+        }else if (filtered.length === 0) {
+            return media;
+        }
+        return filtered;
+    }
   
     const onHandlerStateChange = (event) => {
       if (event.nativeEvent.state === 5) { // 5 corresponds to State.END
         settranslateX(event.nativeEvent.translationX);
         if (event.nativeEvent.translationX > 50) {
-          pickRandomImage();
+            GetNextImage();
         } else if (event.nativeEvent.translationX < -50) {
             ListOfToDeleteImages.push(imageAsset);
             setTotalPhotosDeleted(totalPhotosDeleted + 1);
             
-          pickRandomImage();
+            GetNextImage();
 
         }
         setDirText('');
@@ -87,7 +104,6 @@ export default function SwipeableImage(props) {
   
     const pickRandomImage = async () => {
         setIsStartButtonVisible(false);
-        setCurrentImageIndex(CurrentImageIndex + 1);
       try {
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status !== 'granted') {
@@ -95,7 +111,6 @@ export default function SwipeableImage(props) {
           return;
         }
   
-        let media = [];
         let hasNextPage = true;
         let after = null;
     
@@ -110,16 +125,22 @@ export default function SwipeableImage(props) {
           hasNextPage = result.hasNextPage;
           after = result.endCursor;
         }
-  
-        if (media.length > 0) {
-          const randomImage = media[CurrentImageIndex].uri;
-            setImageAsset(media[CurrentImageIndex]);
           
-        }
+        GetNextImage();
       } catch (error) {
         console.error('Error picking random image:', error);
       }
     };
+
+    function GetNextImage() {
+        
+        setCurrentImageIndex(CurrentImageIndex + 1);
+        let filterList = filterAssetsByYear(media, currentYear);
+        
+        if (filterList.length > 0) {
+            setImageAsset(filterList[CurrentImageIndex]);
+        }
+    }
   
     const animatedStyle = useAnimatedStyle(() => {
       return {
@@ -149,7 +170,7 @@ export default function SwipeableImage(props) {
         {IsStartButtonVisible ? null : <Button title={"Delete Selected Images: " + ListOfToDeleteImages.length} onPress={() => DeleteImage(ListOfToDeleteImages,totalPhotosDeleted)} />}
         */}
         </GestureHandlerRootView>
-        <Sidebar AmountToDelete={ListOfToDeleteImages.length} totalPhotosDeleted={totalPhotosDeleted} ListOfToDeleteImages={ListOfToDeleteImages}></Sidebar>
+        {!IsStartButtonVisible ? <Sidebar setcurrentYear={setcurrentYear} currnetphoto={imageAsset} AmountToDelete={ListOfToDeleteImages.length} totalPhotosDeleted={totalPhotosDeleted} ListOfToDeleteImages={ListOfToDeleteImages} /> : null}
         </View>
       
     );
@@ -162,8 +183,6 @@ export const DeleteImage = async (imageasset, totalPhotosDeleted) => {
         ListOfToDeleteImages = [];
         UpdateDeletedImages(totalPhotosDeleted);
         await MediaLibrary.deleteAssetsAsync(imageasset);
-
-        
 
     }catch (error) {
         console.error('Error deleting image:', error);

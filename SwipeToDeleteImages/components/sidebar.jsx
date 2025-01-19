@@ -3,12 +3,18 @@ import { IconSymbol } from './ui/IconSymbol';
 
 import {StyleSheet, Button, View, Platform , TouchableOpacity , Text, Dimensions} from 'react-native';
 import { DeleteImage } from '@/components/ImageComp'
+import YearCalender from '@/components/Calender';
+import ImageInfo from '@/components/ImageInfo'
 
+import dayjs from 'dayjs';
 
 export default function Sidebar(props){
+    
+    const [seeCalender, setCalenderVisible] = useState(Boolean);
+    const [seeInfo, setInfoVisible] = useState(Boolean);
     return (
         <View style={styles.sidebarContainer}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => {setCalenderVisible(!seeCalender)}}>
                 <IconSymbol name="magnifyingglass" size={40} color="white"/>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {DeleteImage(props.ListOfToDeleteImages , props.totalPhotosDeleted )}}>
@@ -17,9 +23,15 @@ export default function Sidebar(props){
                 </IconSymbol>
                 {props.AmountToDelete == 0 ? null : <Text style={styles.binbadge}>{props.AmountToDelete}</Text>}
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setInfoVisible(!seeInfo)}>
                 <IconSymbol name="info" size={40} color="white"/>
             </TouchableOpacity>
+            {seeCalender && 
+                <YearCalender setcurrentYear={props.setcurrentYear} setCalenderVisible={setCalenderVisible}/>
+            }
+            {seeInfo &&
+                <ImageInfo photo={props.currnetphoto}/>
+            }
         </View>
     )
 }
@@ -56,5 +68,17 @@ const styles = StyleSheet.create({
         width: 30,
         height: 30,
         borderRadius: 33,
-    }
+    },
+    CalendarContainer: {
+        position: 'absolute',
+        
+        alignSelf: 'center',
+        width: (Dimensions.get('window').width - 50),
+        borderColor: '#000000',
+        marginBottom: 50,
+        borderWidth: 3,
+        bottom: 0,
+        backgroundColor: '#FFFFFF',
+        zIndex: 1000,
+      },
 });
