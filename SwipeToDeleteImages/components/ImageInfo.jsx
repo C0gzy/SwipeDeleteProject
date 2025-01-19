@@ -37,30 +37,35 @@ const styles = StyleSheet.create({
         height: Dimensions.get('window').height - 200,
         borderRadius: 20,
         padding: 20,
-        borderColor: '#000000',
+        borderColor: '#FFFFFF',
         marginBottom: 50,
         borderWidth: 3,
         bottom: 0,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#151718',
         zIndex: 1000,
     },
     InfoContainer: {
+        color: 'white',
         gap : 10,
+        marginBottom: 10,
     },
 
     InfoTitle: {
+        color: 'white',
         fontSize: 30,
         fontWeight: 'bold',
         textAlign: 'center',
     },
 
     InfoText: {
+        color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
         flexDirection: 'column'
     },
 
     InfoTextTitle: {
+        color: 'white',
         fontSize: 25,
         fontWeight: 'bold',
         flexDirection: 'column'        

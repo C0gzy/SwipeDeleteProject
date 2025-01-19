@@ -6,7 +6,6 @@ import { DeleteImage } from '@/components/ImageComp'
 import YearCalender from '@/components/Calender';
 import ImageInfo from '@/components/ImageInfo'
 
-import dayjs from 'dayjs';
 
 export default function Sidebar(props){
     

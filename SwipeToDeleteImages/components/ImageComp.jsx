@@ -9,7 +9,7 @@ import {getData , storeData} from '@/components/DataStore';
 import Sidebar from '@/components/sidebar'
 
 import dayjs from 'dayjs';
-import * as MediaLibrary from 'expo-media-library';
+import * as MediaLibrary from 'expo-media-library-patch';
 
 var ListOfToDeleteImages = [];
 var media = [];
@@ -39,7 +39,7 @@ export default function SwipeableImage(props) {
 
     const [totalPhotosDeleted, setTotalPhotosDeleted] = useState(0);
 
-    const [currentYear , setcurrentYear] = useState(2022);
+    const [currentYear , setcurrentYear] = useState(null);
     
 
     useEffect(() => {
@@ -215,6 +215,7 @@ const styles = StyleSheet.create({
     DirText: (color) => {
         if (color === 'Delete') {
             return{
+                fontWeight: 'bold',
                 color: 'red',
                 fontSize: 50,
                 textAlign: 'center',
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
         return{
             color: '#66ff66',
             fontSize: 60,
-            
+            fontWeight: 'bold',
             textAlign: 'center',
             zIndex: 1
         }

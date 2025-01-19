@@ -49,25 +49,27 @@ const styles = StyleSheet.create({
         height: Dimensions.get('window').height - 200,
         borderRadius: 20,
         padding: 20,
-        borderColor: '#000000',
+        borderColor: '#FFFFFF',
         marginBottom: 50,
         borderWidth: 3,
         bottom: 0,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#151718',
         zIndex: 1000,
 
     },
 
     Yearbutton: {
+        color: 'white',
         padding: 10,
         margin: 5,
         borderWidth: 2,
-        borderColor: '#000000',
+        borderColor: '#FF5733',
         borderRadius: 5,
-        backgroundColor: '#FFFFFF',
+        
     },
 
     YeatText: {
+        color: 'white',
         fontSize: 30,
         fontWeight: 'bold',
         textAlign: 'center',

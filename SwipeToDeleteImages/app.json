@@ -39,6 +39,7 @@
         {
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
           "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "MANAGE_EXTERNAL_STORAGE": "Allow $(PRODUCT_NAME) to manage your files.",
           "isAccessMediaLocationEnabled": true
         }
       ]

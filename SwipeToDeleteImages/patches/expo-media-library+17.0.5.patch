@@ -1,0 +1,37 @@
+diff --git a/node_modules/expo-media-library/android/src/main/java/expo/modules/medialibrary/MediaLibraryUtils.kt b/node_modules/expo-media-library/android/src/main/java/expo/modules/medialibrary/MediaLibraryUtils.kt
+index 920377c..f9609ae 100644
+--- a/node_modules/expo-media-library/android/src/main/java/expo/modules/medialibrary/MediaLibraryUtils.kt
++++ b/node_modules/expo-media-library/android/src/main/java/expo/modules/medialibrary/MediaLibraryUtils.kt
+@@ -92,11 +92,12 @@ object MediaLibraryUtils {
+             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+               val columnId = filesToDelete.getColumnIndex(MediaStore.MediaColumns._ID)
+               val id = filesToDelete.getLong(columnId)
+-              val assetUri = ContentUris.withAppendedId(EXTERNAL_CONTENT_URI, id)
++              val assetUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+               val rowsDeleted = context.contentResolver.delete(assetUri, null)
+               if (rowsDeleted == 0) {
+-                throw AssetFileException("Could not delete file.")
++                throw AssetFileException("Could not delete file. v2")
+               }
++
+             } else {
+               val dataColumnIndex = filesToDelete.getColumnIndex(MediaStore.MediaColumns.DATA)
+               val filePath = filesToDelete.getString(dataColumnIndex)
+@@ -108,7 +109,7 @@ object MediaLibraryUtils {
+                   arrayOf(filePath)
+                 )
+               } else {
+-                throw AssetFileException("Could not delete file.")
++                throw AssetFileException("Could not delete file. v3")
+               }
+             }
+           }
+@@ -123,7 +124,7 @@ object MediaLibraryUtils {
+       )
+     } catch (e: Exception) {
+       e.printStackTrace()
+-      promise.reject(ERROR_UNABLE_TO_DELETE, "Could not delete file.", e)
++      promise.reject(ERROR_UNABLE_TO_DELETE, "Could not delete file. v4", e)
+     }
+   }
+ 

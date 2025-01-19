@@ -16,17 +16,17 @@ export default function HomeScreen() {
 
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
         <SwipeableImage  />
         
-    </ThemedView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    
+    backgroundColor: '#151718',
     flexDirection: 'column',
     
     justifyContent: 'center',

@@ -29,7 +29,7 @@ export default function Settings() {
 
 
     return (
-        <ThemedView style={styles.container}>
+        <View style={styles.container}>
             <Text style={styles.titleContainer}>Settings</Text>
             <View style={styles.subcontainer}>
               <Text style={styles.subheader}>Donate</Text>
@@ -62,14 +62,14 @@ export default function Settings() {
               </View>
             </View>
 
-        </ThemedView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      
+      backgroundColor: '#151718',
       alignItems: 'center',
     },
     subheader: {
