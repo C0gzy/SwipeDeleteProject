@@ -45,13 +45,16 @@ const styles = StyleSheet.create({
         position: 'absolute',
             
         alignSelf: 'center',
+        
         width: Dimensions.get('window').width - 20,
         height: Dimensions.get('window').height - 200,
+        left: '-35%',
         borderRadius: 20,
         padding: 20,
         borderColor: '#FFFFFF',
-        marginBottom: 50,
+        marginBottom: 70,
         borderWidth: 3,
+        
         bottom: 0,
         backgroundColor: '#151718',
         zIndex: 1000,

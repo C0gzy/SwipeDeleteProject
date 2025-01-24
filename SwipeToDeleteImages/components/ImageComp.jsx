@@ -1,7 +1,7 @@
 import {Image} from 'expo-image'
 import { GestureHandlerRootView , PanGestureHandler} from "react-native-gesture-handler";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import React, { useState , useEffect} from 'react';
+import React, { useState , useEffect, render} from 'react';
 import {StyleSheet, Button, View, Platform, Dimensions, Text} from 'react-native';
 
 import {getData , storeData} from '@/components/DataStore';
@@ -41,8 +41,10 @@ export default function SwipeableImage(props) {
 
     const [currentYear , setcurrentYear] = useState(null);
     
-
+      
+    
     useEffect(() => {
+      
       const fetchData = async () => {
         try {
           const data = await getData('totalPhotosDeleted');
@@ -52,7 +54,8 @@ export default function SwipeableImage(props) {
           console.error('Error fetching data:', error);
         }
       };
-  
+      
+      pickRandomImage();
       fetchData();
     }, []);
   
@@ -165,7 +168,6 @@ export default function SwipeableImage(props) {
         </PanGestureHandler>
         
         
-        {IsStartButtonVisible ? <Button title="Start Deleting" onPress={pickRandomImage} /> : null}
         {/*
         {IsStartButtonVisible ? null : <Button title={"Delete Selected Images: " + ListOfToDeleteImages.length} onPress={() => DeleteImage(ListOfToDeleteImages,totalPhotosDeleted)} />}
         */}
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
     },
     image: {
         width: Dimensions.get('window').width - 20,
-        height: Dimensions.get('window').height - 300,
+        height: Dimensions.get('window').height - 200,
       borderWidth: 0,
       borderColor: 'white',
     },
