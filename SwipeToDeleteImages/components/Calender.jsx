@@ -1,13 +1,23 @@
-import {StyleSheet, Button, View, Platform , TouchableOpacity , Text, Dimensions, ScrollView} from 'react-native';
+import {StyleSheet, Button, View, Platform , Pressable , TouchableOpacity  , Text, Dimensions, ScrollView} from 'react-native';
 import dayjs from 'dayjs';
-
+import Modal from 'react-native-modal';
+import { IconSymbol } from './ui/IconSymbol';
 var Year = dayjs().year();
 
 export default function YearCalender(props){
     
 
     return (
-        <ScrollView style={styles.CalendarContainer}>
+        <Pressable onPress={() => props.setCalenderVisible(false)}>
+        <Modal isVisible={props.seeCalender}>
+        <View style={styles.CalendarContainer}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
+        <Text style={styles.Title}>Select A Year</Text>
+        <TouchableOpacity onPress={() => props.setCalenderVisible(false)}>
+            <IconSymbol name="xmark" size={30} color="white" />
+        </TouchableOpacity>
+        </View>
+        <ScrollView style={{width: '90%'}}>
             <TouchableOpacity style={styles.Yearbutton} onPress={() => {
             props.setcurrentYear(null);
             props.setCalenderVisible(false);
@@ -16,6 +26,10 @@ export default function YearCalender(props){
             </TouchableOpacity>
             <CreateYearList setcurrentYear={props.setcurrentYear} setCalenderVisible={props.setCalenderVisible}/>
         </ScrollView>
+        </View>
+        </Modal>
+        </Pressable>
+        
     )
 }
 
@@ -39,20 +53,28 @@ function YearButton(props){
 }
 
 const styles = StyleSheet.create({
+    Title: {
+        color: 'white',
+        fontSize: 30,
+        fontWeight: 'bold',
+       
+    },
+
     CalendarContainer: {
 
-        flex: 1,
-        position: 'absolute',
+       
+       
             
         alignSelf: 'center',
+        alignItems: 'center',
         
         width: Dimensions.get('window').width - 20,
         height: Dimensions.get('window').height - 200,
-        left: '-35%',
         borderRadius: 20,
-        padding: 20,
+        padding: 10,
         borderColor: '#FFFFFF',
         marginBottom: 70,
+        marginTop: 70,
         borderWidth: 3,
         
         bottom: 0,

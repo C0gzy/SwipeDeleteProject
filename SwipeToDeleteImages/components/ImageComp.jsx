@@ -1,15 +1,20 @@
 import {Image} from 'expo-image'
-import { GestureHandlerRootView , PanGestureHandler} from "react-native-gesture-handler";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import React, { useState , useEffect, render} from 'react';
-import {StyleSheet, Button, View, Platform, Dimensions, Text} from 'react-native';
+import { GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler";
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring, 
+  useAnimatedGestureHandler 
+} from 'react-native-reanimated';
+import React, { useState, useEffect, render } from 'react';
+import { StyleSheet, Button, View, Platform, Dimensions, Text } from 'react-native';
 
-import {getData , storeData} from '@/components/DataStore';
+import {getData, storeData} from '@/components/DataStore';
 
 import Sidebar from '@/components/sidebar'
 
 import dayjs from 'dayjs';
-import * as MediaLibrary from 'expo-media-library-patch';
+import * as MediaLibrary from 'expo-media-library';
 
 var ListOfToDeleteImages = [];
 var media = [];
@@ -29,9 +34,6 @@ export function FetchListOfToDeleteImages(){
 
 export default function SwipeableImage(props) {
     const [imageAsset, setImageAsset] = useState(null);
-    const [translateX, settranslateX] = useState(0);
-    const [rotateZ, setrotateZ] = useState(0);
-
     const [CurrentImageIndex, setCurrentImageIndex] = useState(0);
     
     const [IsStartButtonVisible, setIsStartButtonVisible] = useState(true);
@@ -39,12 +41,48 @@ export default function SwipeableImage(props) {
 
     const [totalPhotosDeleted, setTotalPhotosDeleted] = useState(0);
 
-    const [currentYear , setcurrentYear] = useState(null);
+    const [currentYear, setcurrentYear] = useState(null);
     
+    // Use shared values for animations
+    const translateX = useSharedValue(0);
+    const rotateZ = useSharedValue(0);
+    
+    // Helper function to update direction text
+    const updateDirectionText = (translationX) => {
+      if (translationX > 25) {
+        setDirText('Keep');
+      } else if (translationX < -25) {
+        setDirText('Delete');
+      } else {
+        setDirText('');
+      }
+    };
+
+    // Function to handle keeping an image
+    const handleKeepImage = () => {
+      GetNextImage();
+      // Reset animations after a short delay
+      setTimeout(() => {
+        translateX.value = 0;
+        rotateZ.value = 0;
+        setDirText('');
+      }, 100);
+    };
+
+    // Function to handle deleting an image
+    const handleDeleteImage = () => {
+      ListOfToDeleteImages.push(imageAsset);
+      setTotalPhotosDeleted(totalPhotosDeleted + 1);
+      GetNextImage();
+      // Reset animations after a short delay
+      setTimeout(() => {
+        translateX.value = 0;
+        rotateZ.value = 0;
+        setDirText('');
+      }, 100);
+    };
       
-    
     useEffect(() => {
-      
       const fetchData = async () => {
         try {
           const data = await getData('totalPhotosDeleted');
@@ -57,20 +95,40 @@ export default function SwipeableImage(props) {
       
       pickRandomImage();
       fetchData();
-    }, []);
+    }, [currentYear]);
   
+    // Basic gesture handler for pan gestures
     const onGestureEvent = (event) => {
-      settranslateX(event.nativeEvent.translationX);
-      setrotateZ(translateX / 10); // Adjust the divisor to control the rotation sensitivity
+      const translationX = event.nativeEvent.translationX;
+      translateX.value = translationX;
+      rotateZ.value = translationX / 10; // Adjust the divisor to control the rotation sensitivity
 
-      if (event.nativeEvent.translationX > 25) {
-        setDirText('Keep');
-      }else if (event.nativeEvent.translationX < -25) {
-        setDirText('Delete');
-      }else {
-        setDirText('');
+      updateDirectionText(translationX);
+    };
+
+    const onHandlerStateChange = (event) => {
+      if (event.nativeEvent.state === 5) { // 5 corresponds to State.END
+        const translationX = event.nativeEvent.translationX;
+        
+        if (translationX > 50) {
+          // Handle keep image
+          handleKeepImage();
+        } else if (translationX < -50) {
+          // Handle delete image
+          handleDeleteImage();
+        } else {
+          // Spring back to center
+          translateX.value = withSpring(0, {
+            damping: 15,
+            stiffness: 150,
+          });
+          rotateZ.value = withSpring(0, {
+            damping: 15,
+            stiffness: 150,
+          });
+          setDirText('');
+        }
       }
-
     };
 
     const filterAssetsByYear = (assets, year) => {
@@ -84,27 +142,7 @@ export default function SwipeableImage(props) {
         }
         return filtered;
     }
-  
-    const onHandlerStateChange = (event) => {
-      if (event.nativeEvent.state === 5) { // 5 corresponds to State.END
-        settranslateX(event.nativeEvent.translationX);
-        if (event.nativeEvent.translationX > 50) {
-            GetNextImage();
-        } else if (event.nativeEvent.translationX < -50) {
-            ListOfToDeleteImages.push(imageAsset);
-            setTotalPhotosDeleted(totalPhotosDeleted + 1);
-            
-            GetNextImage();
-
-        }
-        setDirText('');
-        settranslateX(0);
-        setrotateZ(0);
-        //settranslateX(withSpring(0));
-        //rotateZ.value = withSpring(0);
-      }
-    };
-  
+    
     const pickRandomImage = async () => {
         setIsStartButtonVisible(false);
       try {
@@ -136,7 +174,6 @@ export default function SwipeableImage(props) {
     };
 
     function GetNextImage() {
-        
         setCurrentImageIndex(CurrentImageIndex + 1);
         let filterList = filterAssetsByYear(media, currentYear);
         
@@ -145,11 +182,12 @@ export default function SwipeableImage(props) {
         }
     }
   
+    // Animated style using proper animation values
     const animatedStyle = useAnimatedStyle(() => {
       return {
         transform: [
-            { translateX: translateX },
-          { rotateZ: `${rotateZ}deg` },
+          { translateX: translateX.value },
+          { rotateZ: `${rotateZ.value}deg` },
         ],
       };
     });
@@ -163,7 +201,9 @@ export default function SwipeableImage(props) {
         >
           <Animated.View style={[styles.imageContainer, animatedStyle]}>
             <Text style={styles.DirText(DirText)}>{DirText}</Text>
+            <View style={styles.image}>
             {imageAsset && <Image source={{ uri: imageAsset.uri }} style={styles.image} />}
+            </View>
           </Animated.View>
         </PanGestureHandler>
         
@@ -199,6 +239,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
     image: {
+      resizeMode: 'cover',
         width: Dimensions.get('window').width - 20,
         height: Dimensions.get('window').height - 200,
       borderWidth: 0,

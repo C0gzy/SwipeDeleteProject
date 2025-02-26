@@ -30,7 +30,6 @@ export default function Settings() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.titleContainer}>Settings</Text>
             <View style={styles.subcontainer}>
               <Text style={styles.subheader}>Donate</Text>
               <View style={styles.infocontainer}>

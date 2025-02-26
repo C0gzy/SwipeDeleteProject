@@ -14,8 +14,6 @@ import { ThemedView } from '@/components/ThemedView';
 
 
 export default function HomeScreen() {
-
-
   return (
     <View style={styles.container}>
         <SwipeableImage  />
