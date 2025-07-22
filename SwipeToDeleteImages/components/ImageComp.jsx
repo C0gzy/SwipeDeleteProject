@@ -200,7 +200,7 @@ export default function SwipeableImage(props) {
           </Animated.View>
         </GestureDetector>
         :
-        <View style={styles.imageContainer}>
+        <View style={[styles.imageContainer , {width: Dimensions.get('window').width - 20}]}>
           <Text style={styles.DirText('Delete')}>No image{'\n'}found / Left</Text>
         </View>
         }
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
     image: {
-      resizeMode: 'cover',
+      contentFit: 'cover',
         width: Dimensions.get('window').width - 20,
         height: Dimensions.get('window').height - 200,
       borderWidth: 0,
