@@ -188,15 +188,22 @@ export default function SwipeableImage(props) {
   
     return (
         <View>
+          
       <GestureHandlerRootView style={styles.MainImageDector}>
+      {imageAsset ? 
         <GestureDetector gesture={panGesture}>
           <Animated.View style={[styles.imageContainer, animatedStyle]}>
             <Text style={styles.DirText(DirText)}>{DirText}</Text>
             <View style={styles.image}>
-            {imageAsset && <Image source={{ uri: imageAsset.uri }} style={styles.image} />}
+            <Image source={{ uri: imageAsset.uri }} style={styles.image} /> 
             </View>
           </Animated.View>
         </GestureDetector>
+        :
+        <View style={styles.imageContainer}>
+          <Text style={styles.DirText('Delete')}>No image{'\n'}found / Left</Text>
+        </View>
+        }
         
         
         {/*

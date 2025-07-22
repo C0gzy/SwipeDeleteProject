@@ -109,12 +109,16 @@ export default function Sidebar(props){
         </TouchableOpacity>
         { isOpen &&
         <Animated.View style={[styles.pulloutbar, animatedStyle]}>
+            {props.currnetphoto &&
+            <>
             <TouchableOpacity onPress={() => {setCalenderVisible(!seeCalender)}}>
                 <IconSymbol name="magnifyingglass" size={40} color="white"/>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setInfoVisible(!seeInfo)}>
                 <IconSymbol name="info" size={40} color="white"/>
             </TouchableOpacity>
+            </>
+         }
             <TouchableOpacity onPress={() => router.push('/settings')}>
                 <IconSymbol name="gear" size={40} color="white"/>
             </TouchableOpacity>
