@@ -15,7 +15,13 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_MEDIA_LOCATION"
+      ],
+      "package": "com.cogzy.SwipeToDeleteImages"
     },
     "web": {
       "bundler": "metro",
@@ -32,7 +38,6 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-
       ],
       [
         "expo-media-library",
@@ -46,6 +51,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b1a1e5e4-d2fc-421a-8a8d-60c9ac500173"
+      }
     }
   }
 }

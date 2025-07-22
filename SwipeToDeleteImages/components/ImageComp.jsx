@@ -1,10 +1,10 @@
 import {Image} from 'expo-image'
-import { GestureHandlerRootView, PanGestureHandler } from "react-native-gesture-handler";
+import { GestureHandlerRootView, GestureDetector, Gesture } from "react-native-gesture-handler";
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
-  withSpring, 
-  useAnimatedGestureHandler 
+  withSpring,
+  runOnJS
 } from 'react-native-reanimated';
 import React, { useState, useEffect, render } from 'react';
 import { StyleSheet, Button, View, Platform, Dimensions, Text } from 'react-native';
@@ -97,27 +97,19 @@ export default function SwipeableImage(props) {
       fetchData();
     }, [currentYear]);
   
-    // Basic gesture handler for pan gestures
-    const onGestureEvent = (event) => {
-      const translationX = event.nativeEvent.translationX;
-      translateX.value = translationX;
-      rotateZ.value = translationX / 10; // Adjust the divisor to control the rotation sensitivity
-
-      updateDirectionText(translationX);
-    };
-
-    const onHandlerStateChange = (event) => {
-      if (event.nativeEvent.state === 5) { // 5 corresponds to State.END
-        const translationX = event.nativeEvent.translationX;
-        
-        if (translationX > 50) {
-          // Handle keep image
-          handleKeepImage();
-        } else if (translationX < -50) {
-          // Handle delete image
-          handleDeleteImage();
+    // Pan gesture using the new Gesture API
+    const panGesture = Gesture.Pan()
+      .onUpdate((event) => {
+        translateX.value = event.translationX;
+        rotateZ.value = event.translationX / 10;
+        runOnJS(updateDirectionText)(event.translationX);
+      })
+      .onEnd((event) => {
+        if (event.translationX > 50) {
+          runOnJS(handleKeepImage)();
+        } else if (event.translationX < -50) {
+          runOnJS(handleDeleteImage)();
         } else {
-          // Spring back to center
           translateX.value = withSpring(0, {
             damping: 15,
             stiffness: 150,
@@ -126,10 +118,9 @@ export default function SwipeableImage(props) {
             damping: 15,
             stiffness: 150,
           });
-          setDirText('');
+          runOnJS(setDirText)('');
         }
-      }
-    };
+      });
 
     const filterAssetsByYear = (assets, year) => {
         var filtered = media.filter(asset => dayjs(asset.creationTime).year() === year)
@@ -147,8 +138,9 @@ export default function SwipeableImage(props) {
         setIsStartButtonVisible(false);
       try {
         const { status } = await MediaLibrary.requestPermissionsAsync();
-        if (status !== 'granted') {
-          alert('Sorry, we need camera roll permissions to make this work!');
+        console.log('status:', status);
+        if (status  !== 'granted') {
+          console.log('Sorry, we need camera roll permissions to make this work!');
           return;
         }
   
@@ -161,6 +153,8 @@ export default function SwipeableImage(props) {
             first: 100, // Fetch 100 assets at a time
             after: after,
           });
+
+          console.log('result:', result);
     
           media = media.concat(result.assets);
           hasNextPage = result.hasNextPage;
@@ -195,17 +189,14 @@ export default function SwipeableImage(props) {
     return (
         <View>
       <GestureHandlerRootView style={styles.MainImageDector}>
-        <PanGestureHandler
-          onGestureEvent={onGestureEvent}
-          onHandlerStateChange={onHandlerStateChange}
-        >
+        <GestureDetector gesture={panGesture}>
           <Animated.View style={[styles.imageContainer, animatedStyle]}>
             <Text style={styles.DirText(DirText)}>{DirText}</Text>
             <View style={styles.image}>
             {imageAsset && <Image source={{ uri: imageAsset.uri }} style={styles.image} />}
             </View>
           </Animated.View>
-        </PanGestureHandler>
+        </GestureDetector>
         
         
         {/*

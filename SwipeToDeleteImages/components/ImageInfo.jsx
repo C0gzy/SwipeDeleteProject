@@ -1,5 +1,4 @@
-import {StyleSheet, Button, View, Platform, TouchableOpacity ,Dimensions, Text} from 'react-native';
-import Modal from 'react-native-modal';
+import {StyleSheet, Button, View, Platform, TouchableOpacity ,Dimensions, Text, Modal, Pressable} from 'react-native';
 import dayjs from 'dayjs';
 import { IconSymbol } from './ui/IconSymbol';
 
@@ -8,26 +7,41 @@ export default function ImageInfo(props){
         return null;
     }
     
-    var date = dayjs(props.photo.creationTime).format('DD/MM/YYYY HH:mm:ss');
-    console.log('ImageInfo:', date);
+    var date = TurnDateToLocalTime(props.photo.creationTime);
+    var ModifiedDate = TurnDateToLocalTime(props.photo.modificationTime);
+    console.log('ImageInfo:', props.photo);
     return (
-        <Modal isVisible={props.seeInfo}>
-        <View style={styles.ImageInfoContainer}>
-        <View style={{borderBottomWidth: 5, borderBottomColor: 'white',flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
-            <Text style={styles.InfoTitle}>Image Info</Text>
-            <TouchableOpacity onPress={() => props.setInfoVisible(false)}>
-                <IconSymbol name="xmark" size={30} color="white" />
-                </TouchableOpacity>
-            </View>
-            <InfoText text='Photo Name:' PhotoDetail={props.photo.filename}/>
-            <InfoText text='Date:' PhotoDetail={date}/>
-            <InfoText text='Width:' PhotoDetail={props.photo.width}/>
-            <InfoText text='Height:' PhotoDetail={props.photo.height}/>
-        </View>
+        <Modal 
+            visible={props.seeInfo}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => props.setInfoVisible(false)}
+        >
+            <Pressable 
+                style={styles.modalOverlay} 
+                onPress={() => props.setInfoVisible(false)}
+            >
+                <View style={styles.ImageInfoContainer}>
+                    <View style={{borderBottomWidth: 5, borderBottomColor: 'white',flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
+                        <Text style={styles.InfoTitle}>Image Info</Text>
+                        <TouchableOpacity onPress={() => props.setInfoVisible(false)}>
+                            <IconSymbol name="xmark" size={30} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                    <InfoText text='Photo Name:' PhotoDetail={props.photo.filename}/>
+                    <InfoText text='Date:' PhotoDetail={date}/>
+                    <InfoText text='Width:' PhotoDetail={props.photo.width}/>
+                    <InfoText text='Height:' PhotoDetail={props.photo.height}/>
+                    <InfoText text='Modified Date:' PhotoDetail={ModifiedDate}/>
+                </View>
+            </Pressable>
         </Modal>
     )
 }
 
+function TurnDateToLocalTime(date){
+    return dayjs(date).format('DD/MM/YYYY HH:mm:ss');
+}
 
 function InfoText(props){
     if (props.text == null){
@@ -42,8 +56,14 @@ function InfoText(props){
 }
 
 const styles = StyleSheet.create({
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
     ImageInfoContainer: {
-            
         alignSelf: 'center',
         width: Dimensions.get('window').width - 20,
         height: Dimensions.get('window').height - 200,

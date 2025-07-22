@@ -13,6 +13,8 @@ const MAPPING = {
   'magnifyingglass': 'search',
   'trash' : 'delete',
   'info' : 'info',
+  'xmark' : 'close',
+  'text.justify' : 'menu',
   'gear': 'settings',
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',

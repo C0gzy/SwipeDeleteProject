@@ -1,6 +1,5 @@
-import {StyleSheet, Button, View, Platform , Pressable , TouchableOpacity  , Text, Dimensions, ScrollView} from 'react-native';
+import {StyleSheet, Button, View, Platform , Pressable , TouchableOpacity  , Text, Dimensions, ScrollView, Modal} from 'react-native';
 import dayjs from 'dayjs';
-import Modal from 'react-native-modal';
 import { IconSymbol } from './ui/IconSymbol';
 var Year = dayjs().year();
 
@@ -8,28 +7,35 @@ export default function YearCalender(props){
     
 
     return (
-        <Pressable onPress={() => props.setCalenderVisible(false)}>
-        <Modal isVisible={props.seeCalender}>
-        <View style={styles.CalendarContainer}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
-        <Text style={styles.Title}>Select A Year</Text>
-        <TouchableOpacity onPress={() => props.setCalenderVisible(false)}>
-            <IconSymbol name="xmark" size={30} color="white" />
-        </TouchableOpacity>
-        </View>
-        <ScrollView style={{width: '90%'}}>
-            <TouchableOpacity style={styles.Yearbutton} onPress={() => {
-            props.setcurrentYear(null);
-            props.setCalenderVisible(false);
-            }}>
-            <Text style={styles.YeatText}>Entire CameraRoll</Text>
-            </TouchableOpacity>
-            <CreateYearList setcurrentYear={props.setcurrentYear} setCalenderVisible={props.setCalenderVisible}/>
-        </ScrollView>
-        </View>
+        <Modal 
+            visible={props.seeCalender}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => props.setCalenderVisible(false)}
+        >
+            <Pressable 
+                style={styles.modalOverlay} 
+                onPress={() => props.setCalenderVisible(false)}
+            >
+                <View style={styles.CalendarContainer}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
+                        <Text style={styles.Title}>Select A Year</Text>
+                        <TouchableOpacity onPress={() => props.setCalenderVisible(false)}>
+                            <IconSymbol name="xmark" size={30} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                    <ScrollView style={{width: '90%'}}>
+                        <TouchableOpacity style={styles.Yearbutton} onPress={() => {
+                            props.setcurrentYear(null);
+                            props.setCalenderVisible(false);
+                        }}>
+                            <Text style={styles.YeatText}>Entire CameraRoll</Text>
+                        </TouchableOpacity>
+                        <CreateYearList setcurrentYear={props.setcurrentYear} setCalenderVisible={props.setCalenderVisible}/>
+                    </ScrollView>
+                </View>
+            </Pressable>
         </Modal>
-        </Pressable>
-        
     )
 }
 
@@ -53,6 +59,13 @@ function YearButton(props){
 }
 
 const styles = StyleSheet.create({
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
     Title: {
         color: 'white',
         fontSize: 30,
@@ -61,10 +74,6 @@ const styles = StyleSheet.create({
     },
 
     CalendarContainer: {
-
-       
-       
-            
         alignSelf: 'center',
         alignItems: 'center',
         
